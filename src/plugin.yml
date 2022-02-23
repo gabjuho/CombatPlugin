@@ -1,0 +1,5 @@
+name: CombatPlugin
+version: 1.18.1
+author: gabjuho
+main: com.gabjuho.combatPlugin.Main
+api-version: 1.18
