@@ -3,3 +3,7 @@ version: 1.18.1
 author: gabjuho
 main: com.gabjuho.combatPlugin.Main
 api-version: 1.18
+commands:
+  test:
+    description: 테스트용 메시지보내기
+    usage: /<command>

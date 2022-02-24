@@ -15,6 +15,11 @@ public class CombatCommands implements CommandExecutor {
         }
         Player player = (Player)sender;
 
+        if (cmd.getName().equalsIgnoreCase("test"))
+        {
+            player.sendMessage("테스트입니다.");
+        }
+
         return true;
     }
 }
