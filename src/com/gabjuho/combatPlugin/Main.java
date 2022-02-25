@@ -1,5 +1,5 @@
 package com.gabjuho.combatPlugin;
-import com.gabjuho.combatPlugin.commands.CombatCommands;
+import com.gabjuho.combatPlugin.events.CombatEvents;
 import org.bukkit.ChatColor;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -10,10 +10,7 @@ public class Main extends JavaPlugin implements Listener {
     @Override
     public void onEnable()
     {
-        CombatCommands commands = new CombatCommands();
-        getServer().getPluginManager().registerEvents(this,this);
-
-        getCommand("test").setExecutor(commands);
+        getServer().getPluginManager().registerEvents(new CombatEvents(),this);
 
         getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "[Combat] 플러그인이 활성화 되었습니다!");
     }

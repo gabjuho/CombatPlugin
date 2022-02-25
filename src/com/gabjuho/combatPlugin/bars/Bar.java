@@ -3,8 +3,6 @@ package com.gabjuho.combatPlugin.bars;
 import com.gabjuho.combatPlugin.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 
@@ -15,17 +13,26 @@ public class Bar {
 
     private int taskID=-1;
     private final Main plugin;
-    private HashMap<UUID,BossBar> combatList;
-    private HashMap<UUID,Boolean> isCombatList;
+    private final HashMap<UUID,BossBar> combatList = new HashMap<>();
+    private final HashMap<UUID,Boolean> isCombatList = new HashMap<>();
+    private final BossBar[] bossBars = new BossBar[2000];
+    private static int bossBarSize = 0;
 
     public Bar(Main plugin)
     {
         this.plugin = plugin;
+        cast();
     }
 
     public void addPlayer(Player player)
     {
         combatList.get(player.getUniqueId()).addPlayer(player);
+    }
+
+    public void addNewBossBar(BossBar bar)
+    {
+        bossBars[bossBarSize] = bar;
+        bossBarSize++;
     }
 
     public HashMap<UUID, BossBar> getBarList()
@@ -42,35 +49,40 @@ public class Bar {
     {
         setTaskID(Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
-            HashMap<UUID,BossBar> tempBarList;
-            HashMap<UUID,Integer> tempTimeList;
-
             @Override
             public void run() {
 
-                double time = 1.0 / 10;
+                double time = 1.0 / 20;
 
-                for(UUID id: combatList.keySet())
+                if(!combatList.isEmpty())
                 {
-                    Double progress = combatList.get(id).getProgress();
-
-                    if(progress>0 && isCombatList.get(id).equals(true))
+                    for(int i=0;i<bossBarSize;i++)
                     {
-                        progress -= time;
-                        combatList.get(id).setProgress(progress);
-                        combatList.get(id).setTitle(format("&c전투 중 ") + (int) (progress * 10) + "초");
-                    }
-                    else
-                    {
-                        combatList.get(id).removeAll();
-                        combatList.remove(id);
+                        double progress = bossBars[i].getProgress();
+                        progress-=time;
+                        if(progress > 0)
+                        {
+                            bossBars[i].setTitle(format("&c전투 중 "+ (int)(progress * 20)+"초"));
+                            bossBars[i].setProgress(progress);
+                        }
+                        for(UUID id: combatList.keySet()) {
+                            if (combatList.get(id).equals(bossBars[i]))
+                            {
+                                if(progress <=0 || isCombatList.get(id).equals(false))
+                                {
+                                    bossBars[i].setVisible(false);
+                                    isCombatList.put(id, false);
+                                    combatList.remove(id);
+                                }
+                            }
+                        }
                     }
                 }
             }
         },0,20));
     }
 
-    private String format(String msg)
+    public String format(String msg)
     {
         return ChatColor.translateAlternateColorCodes('&',msg);
     }
